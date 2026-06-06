@@ -1,0 +1,73 @@
+/* src/components/PWA/OfflineIndicator.css */
+/* Estilos para el indicador de conexión */
+
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.offline-banner .ant-alert {
+  border-radius: 0;
+  padding: 10px 16px;
+}
+
+.offline-banner .ant-alert-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.offline-subtext {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.online-banner .ant-alert {
+  border-radius: 0;
+  background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%);
+  border: none;
+}
+
+.online-banner .ant-alert-message {
+  color: white;
+  font-weight: 500;
+}
+
+.online-banner .anticon {
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .offline-banner .ant-alert {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .offline-subtext {
+    display: none;
+  }
+}
+
+/* Reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .offline-indicator {
+    animation: none;
+  }
+}

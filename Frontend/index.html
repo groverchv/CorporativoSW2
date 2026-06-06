@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Plan Risk 3D: Generación Automática de Modelos Estructurales, Predicción de Riesgo y Diseño Interno Asistido por IA a partir de Planos Arquitectónicos." />
+  <meta name="keywords" content="Plan Risk 3D, ingeniería civil, arquitectura, IA, inteligencia artificial, modelado 3D, predicción de riesgo, diseño estructural, planos" />
+  <meta name="author" content="Plan Risk 3D Inc." />
+  <meta name="robots" content="index, follow" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Plan Risk 3D" />
+  
+  <!-- iOS PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Plan Risk 3D" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-152x152.png" />
+  
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
+  
+  <!-- Windows Tiles -->
+  <meta name="msapplication-TileColor" content="#1e3a8a" />
+  <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://planrisk3d.com" />
+  <meta property="og:title" content="Plan Risk 3D - Automatización y IA Estructural" />
+  <meta property="og:description" content="Generación Automática de Modelos Estructurales, Predicción de Riesgo y Diseño Interno Asistido por IA a partir de Planos Arquitectónicos." />
+  <meta property="og:image" content="/icons/icon-512x512.png" />
+  <meta property="og:locale" content="es_ES" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Plan Risk 3D - Automatización y IA Estructural" />
+  <meta name="twitter:description" content="Generación Automática de Modelos Estructurales, Predicción de Riesgo y Diseño Interno Asistido por IA" />
+  <meta name="twitter:image" content="/icons/icon-512x512.png" />
+  
+  <!-- Preconnect para performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- Google Fonts para el editor de texto y UI -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&family=Nunito:wght@300;400;600;700&family=PT+Sans:wght@400;700&family=Source+Sans+Pro:wght@300;400;600;700&family=Oswald:wght@300;400;600;700&family=Inter:wght@300;400;600;700&family=Work+Sans:wght@300;400;600;700&family=Quicksand:wght@300;400;600;700&family=Rubik:wght@300;400;600;700&family=Karla:wght@300;400;600;700&family=DM+Sans:wght@400;500;700&family=Manrope:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Mulish:wght@300;400;600;700&family=Barlow:wght@300;400;600;700&family=Red+Hat+Display:wght@300;400;600;700&family=Sora:wght@300;400;600;700&family=Lexend:wght@300;400;600;700&family=Archivo:wght@300;400;600;700&family=Be+Vietnam+Pro:wght@300;400;600;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@300;400;700&family=Lora:wght@400;700&family=Crimson+Text:wght@400;700&family=EB+Garamond:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Cormorant:wght@300;400;700&family=Spectral:wght@300;400;700&family=Bitter:wght@300;400;700&family=Cardo:wght@400;700&family=Bebas+Neue&family=Anton&family=Righteous&family=Pacifico&family=Dancing+Script:wght@400;700&family=Lobster&family=Permanent+Marker&family=Shadows+Into+Light&display=swap"
+    rel="stylesheet">
+  
+  <title>Plan Risk 3D - Automatización y IA Estructural</title>
+  
+  <!-- Fix para SockJS con Vite -->
+  <script>
+    window.global = window;
+  </script>
+  
+  <!-- Inline critical styles para First Paint -->
+  <style>
+    /* Critical CSS para carga rápida */
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff}
+    #root{min-height:100vh}
+    .pwa-loading{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+    .pwa-loading svg{animation:pulse 1.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  </style>
+</head>
+
+<body>
+  <div id="root">
+    <!-- Loader mientras carga la app -->
+    <div class="pwa-loading">
+      <svg width="80" height="80" viewBox="0 0 100 100" fill="#d97706">
+        <circle cx="50" cy="50" r="45" stroke="#d97706" stroke-width="3" fill="none" opacity="0.3"/>
+        <circle cx="50" cy="50" r="20" fill="#d97706"/>
+      </svg>
+      <p style="margin-top:16px;color:#d97706;font-size:14px">Cargando...</p>
+    </div>
+  </div>
+
+  <!-- Asistente de Voz Conversacional AI de ElevenLabs -->
+  <elevenlabs-convai 
+    agent-id="agent_6401ktd6k9anebdt1jqezb251kdg"
+    action-text="Hablar con Asistente"
+    start-call-text="Iniciar llamada"
+    end-call-text="Colgar"
+    listening-text="Escuchando..."
+    speaking-text="Asistente hablando..."
+    disable-banner="true"
+    avatar-orb-color-1="#d97706"
+    avatar-orb-color-2="#b45309"
+  ></elevenlabs-convai>
+  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>

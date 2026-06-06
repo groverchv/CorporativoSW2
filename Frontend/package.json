@@ -1,0 +1,58 @@
+{
+  "name": "ciencias-de-la-educacion",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "generate-icons": "node scripts/generate-pwa-icons.mjs"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.0.1",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@stomp/stompjs": "^7.2.1",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.107.0",
+    "antd": "^5.9.6",
+    "axios": "^1.4.0",
+    "docx": "^9.5.1",
+    "dompurify": "^3.3.0",
+    "file-saver": "^2.0.5",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
+    "mammoth": "^1.11.0",
+    "quill": "^2.0.3",
+    "quill-better-table": "^1.2.10",
+    "quill-image-resize-module-react": "^3.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-quill-new": "^3.6.0",
+    "react-router-dom": "^6.14.2",
+    "recharts": "^3.5.1",
+    "sockjs-client": "^1.6.1"
+  },
+  "dependenciesMeta": {
+    "jspdf": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "sharp": "^0.34.5",
+    "vite": "^7.1.7",
+    "vite-plugin-pwa": "^1.2.0",
+    "workbox-window": "^7.4.0"
+  }
+}

@@ -1,0 +1,44 @@
+/* src/App.css */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #05070c;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Para iOS/Safari, que odian background-attachment: fixed */
+@supports (-webkit-touch-callout: none) {
+  .app-shell {
+    background-attachment: scroll;
+  }
+}
+
+.app-main {
+  flex: 1;
+  padding: 0;
+}
+
+/* Ocultar barra de desplazamiento globalmente */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html,
+body {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Posicionamiento del widget conversacional de ElevenLabs */
+elevenlabs-convai {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+}

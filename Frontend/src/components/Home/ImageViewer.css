@@ -1,0 +1,175 @@
+/* src/components/Dashboard/ImageViewer.css */
+
+.image-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+    cursor: pointer;
+    /* Prevenir scroll rebote en iOS */
+    overscroll-behavior: contain;
+}
+
+.image-viewer-overlay.closing {
+    animation: fadeOut 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Botones de acción */
+.image-viewer-actions {
+    position: absolute;
+    top: 20px; /* Un poco más abajo para evitar el notch en móviles */
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 10001;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    /* Sombra para mejorar visibilidad sobre fondos claros */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.action-btn.download-btn {
+    background: rgba(82, 196, 26, 0.95);
+    color: white;
+}
+
+.action-btn.download-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn.close-btn {
+    background: rgba(255, 77, 79, 0.95);
+    color: white;
+    padding: 10px 14px;
+}
+
+/* Contenedor de imagen */
+.image-viewer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.image-viewer-content img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    animation: scaleIn 0.3s ease;
+    user-select: none;
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Hint de cierre */
+.image-viewer-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    pointer-events: none;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* --- RESPONSIVE --- */
+
+@media (max-width: 768px) {
+    .image-viewer-actions {
+        top: 16px;
+        right: 16px;
+        gap: 10px;
+        /* Aseguramos que los botones no se salgan de la pantalla */
+        max-width: 100%;
+        flex-wrap: wrap; 
+        justify-content: flex-end;
+    }
+
+    .action-btn {
+        padding: 8px 12px; /* Un poco más compactos */
+        font-size: 13px;
+    }
+    
+    /* IMPORTANTE: Eliminé la regla que ocultaba el span aquí */
+    /* Ahora el texto se verá siempre */
+
+    .image-viewer-content {
+        padding-top: 60px; /* Espacio para que la imagen no quede bajo los botones */
+    }
+    
+    .image-viewer-content img {
+        max-height: 80vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-viewer-actions {
+        top: 12px;
+        right: 12px;
+        gap: 8px;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        min-height: 40px; /* Altura mínima para buen touch */
+    }
+    
+    /* Hacemos el texto un poco más pequeño para que quepa bien */
+    .action-btn span {
+        font-size: 12px;
+        display: inline-block; /* Aseguramos que se muestre */
+    }
+
+    .action-btn.download-btn {
+        /* Damos prioridad visual al botón de descarga */
+        flex-grow: 0; 
+    }
+
+    .image-viewer-hint {
+        bottom: 20px;
+        font-size: 11px;
+        padding: 6px 12px;
+        width: max-content;
+    }
+}

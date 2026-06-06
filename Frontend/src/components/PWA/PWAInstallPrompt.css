@@ -1,0 +1,183 @@
+/* src/components/PWA/PWAInstallPrompt.css */
+/* Estilos para el prompt de instalación PWA */
+
+.pwa-install-modal .ant-modal-content {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pwa-install-content {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.pwa-install-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, #2600af 0%, #4a00e0 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(38, 0, 175, 0.3);
+}
+
+.pwa-install-icon img {
+  width: 50px;
+  height: 50px;
+  filter: brightness(0) invert(1);
+}
+
+.pwa-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+  text-align: left;
+}
+
+.pwa-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.pwa-feature-icon {
+  color: #2600af;
+  font-size: 16px;
+}
+
+.pwa-install-btn {
+  background: linear-gradient(135deg, #2600af 0%, #4a00e0 100%);
+  border: none;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pwa-install-btn:hover {
+  background: linear-gradient(135deg, #3300cc 0%, #5a10f0 100%);
+}
+
+/* iOS Modal */
+.pwa-ios-content {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.ios-steps {
+  text-align: left;
+  margin: 20px 0;
+}
+
+.ios-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.step-number {
+  width: 28px;
+  height: 28px;
+  background: #2600af;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ios-share-icon {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 18px;
+  color: #007aff;
+}
+
+/* FAB (Floating Action Button) */
+.pwa-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  background: linear-gradient(135deg, #2600af 0%, #4a00e0 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(38, 0, 175, 0.5);
+  z-index: 9999;
+  animation: fabPulse 2s infinite;
+  border-radius: 50% !important;
+}
+
+.pwa-fab:hover {
+  background: linear-gradient(135deg, #3300cc 0%, #5a10f0 100%);
+  transform: scale(1.05);
+}
+
+.pwa-fab .anticon {
+  font-size: 24px;
+}
+
+@keyframes fabPulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(38, 0, 175, 0.5);
+  }
+  50% {
+    box-shadow: 0 6px 30px rgba(38, 0, 175, 0.7);
+  }
+}
+
+/* Responsive - mover arriba en móvil para evitar recorte */
+@media (max-width: 768px) {
+  .pwa-fab {
+    bottom: 20px;
+    right: 16px;
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+  }
+  
+  .pwa-fab .anticon {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pwa-features {
+    grid-template-columns: 1fr;
+  }
+  
+  .pwa-fab {
+    bottom: 16px;
+    right: 12px;
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+  }
+  
+  .pwa-fab .anticon {
+    font-size: 20px;
+  }
+}
+
+/* Reducir movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-fab {
+    animation: none;
+  }
+  
+  .pwa-fab:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,5 @@
+-- =========================================================================
+-- DATOS SEMILLA PARA PLAN RISK 3D
+-- Nota: La base de datos ahora solo almacena información de usuarios.
+-- Los contenidos de la landing page corporativa son estáticos en el frontend.
+-- =========================================================================
