@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Statistic, Typography, Spin, List, Progress, Radio, Empty, Badge, Timeline, Space } from "antd";
+import { Card, Row, Col, Statistic, Typography, Spin, List, Progress, Radio, Empty, Badge, Timeline, Space, Table, Tag } from "antd";
 import {
   UserOutlined,
   FileTextOutlined,
@@ -12,14 +12,14 @@ import {
   SafetyOutlined,
   TrophyOutlined,
   DashboardOutlined,
+  CrownOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import AuthService from "../../services/AuthService.js";
 import UsuarioService from "../../services/UsuarioService.js";
-import MenuService from "../../services/MenuService.js";
-import Sub_MenuService from "../../services/Sub_MenuService.js";
-import ContenidoService from "../../services/ContenidoService.js";
 import NotificationService from "../../services/NotificationService.js";
+import KPIService from "../../services/KPIService.js";
 
 const { Title, Text } = Typography;
 
@@ -40,23 +40,19 @@ export default function DashboardHome() {
   const [stats, setStats] = useState({
     totalUsuarios: 0,
     usuariosActivos: 0,
-    totalMenus: 0,
-    menusActivos: 0,
-    totalSubmenus: 0,
-    submenusActivos: 0,
-    totalContenidos: 0,
-    contenidosPorSubmenu: [],
+    kpis: null,
   });
 
   const fetchStatistics = async () => {
     setLoading(true);
     try {
       // Fetch all data concurrently
-      const [usuarios, menus, submenus, contenidos] = await Promise.all([
+      const [usuarios, kpiData] = await Promise.all([
         UsuarioService.getAllUsuarios(),
-        MenuService.getAllMenus(),
-        Sub_MenuService.getAllSubMenu(),
-        ContenidoService.getAllContenidos(),
+        KPIService.getDashboardKPIs().catch(err => {
+          console.error("No se pudieron cargar los KPIs avanzados:", err);
+          return null;
+        })
       ]);
 
       // Calculate statistics
@@ -64,51 +60,10 @@ export default function DashboardHome() {
         ? usuarios.filter((u) => u.estado === true || u.estado === "true" || u.estado === 1).length
         : 0;
 
-      const menusActivos = Array.isArray(menus)
-        ? menus.filter((m) => m.estado === true || m.estado === "true" || m.estado === 1).length
-        : 0;
-
-      const submenusActivos = Array.isArray(submenus)
-        ? submenus.filter((s) => s.estado === true || s.estado === "true" || s.estado === 1).length
-        : 0;
-
-      // Group content by submenu - Show ALL submenus
-      const contenidosPorSubmenu = [];
-      if (Array.isArray(submenus)) {
-        submenus.forEach((submenu) => {
-          const contenidosCount = Array.isArray(contenidos)
-            ? contenidos.filter((c) => {
-                // El backend puede devolver subMenu o sub_menu dependiendo de la serialización
-                const subMenuId = c.subMenu?.id || c.sub_menu?.id;
-                return subMenuId === submenu.id;
-              }).length
-            : 0;
-
-          // Show ALL submenus, regardless of content or status
-          contenidosPorSubmenu.push({
-            submenuId: submenu.id,
-            submenuNombre: submenu.titulo,
-            menuNombre: submenu.menu_id?.titulo || submenu.menu?.titulo || "Sin menú",
-            menuId: submenu.menu_id?.id || submenu.menu?.id || null,
-            contenidosCount,
-            estado: submenu.estado,
-            ruta: submenu.ruta,
-          });
-        });
-      }
-
-      // Sort by content count (descending)
-      contenidosPorSubmenu.sort((a, b) => b.contenidosCount - a.contenidosCount);
-
       setStats({
         totalUsuarios: Array.isArray(usuarios) ? usuarios.length : 0,
         usuariosActivos,
-        totalMenus: Array.isArray(menus) ? menus.length : 0,
-        menusActivos,
-        totalSubmenus: Array.isArray(submenus) ? submenus.length : 0,
-        submenusActivos,
-        totalContenidos: Array.isArray(contenidos) ? contenidos.length : 0,
-        contenidosPorSubmenu,
+        kpis: kpiData,
       });
     } catch (error) {
       console.error("Error fetching statistics:", error);
@@ -136,14 +91,6 @@ export default function DashboardHome() {
 
   const activeUsersPercentage = stats.totalUsuarios > 0
     ? Math.round((stats.usuariosActivos / stats.totalUsuarios) * 100)
-    : 0;
-
-  const activeMenusPercentage = stats.totalMenus > 0
-    ? Math.round((stats.menusActivos / stats.totalMenus) * 100)
-    : 0;
-
-  const activeSubmenusPercentage = stats.totalSubmenus > 0
-    ? Math.round((stats.submenusActivos / stats.totalSubmenus) * 100)
     : 0;
 
   return (
@@ -176,23 +123,11 @@ export default function DashboardHome() {
         <Col xs={24} sm={12} lg={6}>
           <Card hoverable>
             <Statistic
-              title="Total Menús"
-              value={stats.totalMenus}
-              prefix={<MenuOutlined />}
-              valueStyle={{ color: "#0d9488" }}
-              suffix={<span style={{ fontSize: 12, color: "#64748b" }}>({stats.menusActivos} activos)</span>}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <Card hoverable>
-            <Statistic
-              title="Total Submenús"
-              value={stats.totalSubmenus}
+              title="Planos Procesados (Total)"
+              value={stats.kpis?.rendimiento?.total_planos || 0}
               prefix={<AppstoreOutlined />}
               valueStyle={{ color: "#fa8c16" }}
-              suffix={<span style={{ fontSize: 12, color: "#64748b" }}>({stats.submenusActivos} activos)</span>}
+              suffix={<span style={{ fontSize: 12, color: "#64748b" }}>({stats.kpis?.rendimiento?.planos_ultimo_mes || 0} mes actual)</span>}
             />
           </Card>
         </Col>
@@ -200,10 +135,11 @@ export default function DashboardHome() {
         <Col xs={24} sm={12} lg={6}>
           <Card hoverable>
             <Statistic
-              title="Total Contenidos"
-              value={stats.totalContenidos}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: "#7c3aed" }}
+              title="MRR (Ganancias Estimadas)"
+              value={stats.kpis?.finanzas?.mrr || 0}
+              prefix={<span style={{ fontWeight: 'bold' }}>Bs.</span>}
+              valueStyle={{ color: "#10b981" }}
+              suffix={<span style={{ fontSize: 12, color: "#64748b" }}>({stats.kpis?.finanzas?.total_premium || 0} Premium, {stats.kpis?.finanzas?.total_estrella || 0} Estrella)</span>}
             />
           </Card>
         </Col>
@@ -211,116 +147,46 @@ export default function DashboardHome() {
 
       {/* Gráficas Estadísticas */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        {/* Gráfica de distribución por menú */}
+        {/* Distribución de Profesiones */}
         <Col xs={24} lg={12}>
           <Card
             title={
               <span>
-                <AppstoreOutlined style={{ marginRight: 8, color: "#1890ff" }} />
-                Distribución de Contenidos por Menú
+                <UserOutlined style={{ marginRight: 8, color: "#7c3aed" }} />
+                Demografía de Usuarios (Profesiones)
               </span>
             }
             hoverable
-            styles={{ body: { padding: '24px' } }}
+            styles={{ body: { padding: '24px', display: 'flex', justifyContent: 'center' } }}
           >
-            {stats.totalContenidos > 0 ? (
+            {stats.kpis && stats.kpis.demografia ? (
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={(() => {
-                    const menuData = {};
-                    stats.contenidosPorSubmenu.forEach(item => {
-                      if (!menuData[item.menuNombre]) {
-                        menuData[item.menuNombre] = {
-                          menu: item.menuNombre,
-                          contenidos: 0,
-                        };
-                      }
-                      menuData[item.menuNombre].contenidos += item.contenidosCount;
-                    });
-                    return Object.values(menuData).sort((a, b) => b.contenidos - a.contenidos);
-                  })()}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="menu" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={80}
-                    style={{ fontSize: 12 }}
-                  />
-                  <YAxis style={{ fontSize: 12 }} />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Estudiantes', value: stats.kpis.demografia.estudiantes },
+                      { name: 'Profesionales', value: stats.kpis.demografia.profesionales },
+                      { name: 'Otros', value: stats.kpis.demografia.otros },
+                    ].filter(d => d.value > 0)}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    innerRadius={60}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    <Cell fill="#3b82f6" />
+                    <Cell fill="#10b981" />
+                    <Cell fill="#f59e0b" />
+                  </Pie>
+                  <Tooltip />
                   <Legend />
-                  <Bar 
-                    dataKey="contenidos" 
-                    name="Contenidos" 
-                    fill="#1890ff"
-                    radius={[8, 8, 0, 0]}
-                  />
-                </BarChart>
+                </PieChart>
               </ResponsiveContainer>
             ) : (
-              <Empty description="No hay contenidos para mostrar" />
+              <Empty description="No hay datos demográficos disponibles" />
             )}
-          </Card>
-        </Col>
-
-        {/* Top 5 Submenús */}
-        <Col xs={24} lg={12}>
-          <Card
-            title={
-              <span>
-                <TrophyOutlined style={{ marginRight: 8, color: "#faad14" }} />
-                Top 5 Submenús con Más Contenido
-              </span>
-            }
-            hoverable
-            styles={{ body: { padding: '24px' } }}
-          >
-            <List
-              size="large"
-              dataSource={stats.contenidosPorSubmenu.slice(0, 5)}
-              renderItem={(item, index) => (
-                <List.Item>
-                  <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
-                    <div style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      background: index === 0 ? '#faad14' : index === 1 ? '#d9d9d9' : index === 2 ? '#cd7f32' : '#f0f0f0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 'bold',
-                      color: index < 3 ? 'white' : '#8c8c8c',
-                      fontSize: 16,
-                    }}>
-                      {index + 1}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <Text strong style={{ display: 'block', fontSize: 14 }}>{item.submenuNombre}</Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        📁 {item.menuNombre}
-                      </Text>
-                    </div>
-                    <Badge 
-                      count={item.contenidosCount} 
-                      showZero 
-                      style={{ 
-                        backgroundColor: item.contenidosCount > 0 ? '#1890ff' : '#d9d9d9',
-                        fontSize: 14,
-                        padding: '0 12px',
-                        height: 28,
-                        lineHeight: '28px',
-                      }} 
-                    />
-                  </div>
-                </List.Item>
-              )}
-            />
           </Card>
         </Col>
       </Row>
@@ -353,24 +219,12 @@ export default function DashboardHome() {
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <Text>Menús Activos</Text>
-                  <Text strong>{stats.menusActivos}/{stats.totalMenus}</Text>
+                  <Text>Usuarios con Planos Activos (30 días)</Text>
+                  <Text strong>{stats.kpis?.rendimiento?.usuarios_activos || 0}/{stats.totalUsuarios}</Text>
                 </div>
                 <Progress
-                  percent={stats.totalMenus > 0 ? Math.round((stats.menusActivos / stats.totalMenus) * 100) : 0}
-                  strokeColor="#1890ff"
-                  size="small"
-                />
-              </div>
-
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <Text>Submenús Activos</Text>
-                  <Text strong>{stats.submenusActivos}/{stats.totalSubmenus}</Text>
-                </div>
-                <Progress
-                  percent={stats.totalSubmenus > 0 ? Math.round((stats.submenusActivos / stats.totalSubmenus) * 100) : 0}
-                  strokeColor="#722ed1"
+                  percent={stats.kpis?.rendimiento?.porcentaje_usuarios_activos || 0}
+                  strokeColor="#f59e0b"
                   size="small"
                 />
               </div>
@@ -378,38 +232,167 @@ export default function DashboardHome() {
           </Card>
         </Col>
 
-        {/* Métricas Clave */}
+        {/* Desglose de Planes */}
         <Col xs={24} lg={12}>
           <Card
             title={
               <span>
                 <TrophyOutlined style={{ marginRight: 8, color: "#faad14" }} />
-                Métricas Clave
+                Usuarios por Plan
               </span>
             }
             hoverable
           >
             <Space direction="vertical" style={{ width: '100%' }} size="large">
               <div>
-                <Text type="secondary" style={{ fontSize: 12 }}>Contenidos por Submenú</Text>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-                  <Text strong style={{ fontSize: 28, color: '#1890ff' }}>
-                    {stats.totalSubmenus > 0 ? Math.round(stats.totalContenidos / stats.totalSubmenus) : 0}
-                  </Text>
-                  <Text type="secondary">promedio</Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text><CrownOutlined style={{ color: "#faad14", marginRight: 8 }} />Plan Estrella</Text>
+                  <Text strong>{stats.kpis?.finanzas?.total_estrella || 0}</Text>
                 </div>
+                <Progress
+                  percent={stats.totalUsuarios > 0 ? Math.round(((stats.kpis?.finanzas?.total_estrella || 0) / stats.totalUsuarios) * 100) : 0}
+                  strokeColor="#faad14"
+                  size="small"
+                />
               </div>
 
               <div>
-                <Text type="secondary" style={{ fontSize: 12 }}>Categorías con Contenido</Text>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
-                  <Text strong style={{ fontSize: 28, color: '#52c41a' }}>
-                    {stats.contenidosPorSubmenu.filter(s => s.contenidosCount > 0).length}
-                  </Text>
-                  <Text type="secondary">de {stats.contenidosPorSubmenu.length}</Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text><StarOutlined style={{ color: "#1890ff", marginRight: 8 }} />Plan Premium</Text>
+                  <Text strong>{stats.kpis?.finanzas?.total_premium || 0}</Text>
                 </div>
+                <Progress
+                  percent={stats.totalUsuarios > 0 ? Math.round(((stats.kpis?.finanzas?.total_premium || 0) / stats.totalUsuarios) * 100) : 0}
+                  strokeColor="#1890ff"
+                  size="small"
+                />
               </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text><UserOutlined style={{ color: "#8c8c8c", marginRight: 8 }} />Plan Normal (Gratis)</Text>
+                  <Text strong>{stats.kpis?.detalles?.usuarios_normales || 0}</Text>
+                </div>
+                <Progress
+                  percent={stats.totalUsuarios > 0 ? Math.round(((stats.kpis?.detalles?.usuarios_normales || 0) / stats.totalUsuarios) * 100) : 0}
+                  strokeColor="#8c8c8c"
+                  size="small"
+                />
+              </div>
+              
+              {stats.kpis?.finanzas?.usuarios_por_expirar > 0 && (
+                <div style={{ padding: '10px', background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: '6px' }}>
+                  <Text type="danger">
+                    ⚠️ Hay {stats.kpis.finanzas.usuarios_por_expirar} suscripciones por expirar en los próximos 15 días.
+                  </Text>
+                </div>
+              )}
             </Space>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Tablas de Detalles */}
+      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+        {/* Tabla Suscripciones */}
+        <Col xs={24} lg={12}>
+          <Card
+            title={
+              <span>
+                <CrownOutlined style={{ marginRight: 8, color: "#10b981" }} />
+                Suscripciones Activas (Pago)
+              </span>
+            }
+            hoverable
+          >
+            <Table
+              dataSource={stats.kpis?.detalles?.suscripciones || []}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+              size="small"
+              columns={[
+                {
+                  title: 'Usuario',
+                  dataIndex: 'nombre',
+                  key: 'nombre',
+                  render: (text, record) => `${text} ${record.apellido}`,
+                },
+                {
+                  title: 'Correo',
+                  dataIndex: 'email',
+                  key: 'email',
+                },
+                {
+                  title: 'Plan',
+                  dataIndex: 'rol',
+                  key: 'rol',
+                  render: (rol) => {
+                    let color = rol === 'usuario_estrella' ? 'gold' : 'blue';
+                    let label = rol === 'usuario_estrella' ? 'Estrella' : 'Premium';
+                    return <Tag color={color}>{label}</Tag>;
+                  }
+                },
+                {
+                  title: 'Aporte',
+                  key: 'aporte',
+                  render: (_, record) => {
+                    const precios = stats.kpis?.detalles?.precios_actuales || {};
+                    const monto = record.rol === 'usuario_estrella' 
+                      ? (precios.usuario_estrella || 180) 
+                      : (precios.usuario_premium || 220);
+                    return <Text strong style={{ color: "#10b981" }}>Bs. {monto}</Text>;
+                  }
+                }
+              ]}
+            />
+          </Card>
+        </Col>
+
+        {/* Tabla Planos */}
+        <Col xs={24} lg={12}>
+          <Card
+            title={
+              <span>
+                <AppstoreOutlined style={{ marginRight: 8, color: "#fa8c16" }} />
+                Últimos Planos Procesados
+              </span>
+            }
+            hoverable
+          >
+            <Table
+              dataSource={stats.kpis?.detalles?.planos_recientes || []}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+              size="small"
+              columns={[
+                {
+                  title: 'ID Plano',
+                  dataIndex: 'id',
+                  key: 'id',
+                  render: (id) => <Text strong>#{id}</Text>
+                },
+                {
+                  title: 'Creador',
+                  dataIndex: 'usuario_nombre',
+                  key: 'usuario_nombre',
+                },
+                {
+                  title: 'Fecha',
+                  dataIndex: 'created_at',
+                  key: 'created_at',
+                  render: (date) => new Date(date).toLocaleDateString()
+                },
+                {
+                  title: 'Estado',
+                  dataIndex: 'status',
+                  key: 'status',
+                  render: (status) => {
+                    let color = status === 'completed' ? 'green' : status === 'processing' ? 'orange' : 'default';
+                    return <Tag color={color}>{status || 'N/A'}</Tag>;
+                  }
+                }
+              ]}
+            />
           </Card>
         </Col>
       </Row>

@@ -28,7 +28,8 @@ export default function Sidebar({ open, onClose }) {
   ];
 
   if (isAuthenticated) {
-    items.push({ key: "/perfil", label: "Mi Perfil", icon: <UserOutlined /> });
+    items.push({ key: "/dashboard", label: "Dashboard", icon: <AppstoreOutlined /> });
+    items.push({ key: "/dashboard/perfil", label: "Mi Perfil", icon: <UserOutlined /> });
   }
 
   const handleMenuClick = ({ key }) => {

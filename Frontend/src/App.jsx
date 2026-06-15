@@ -12,20 +12,9 @@ import { PWAInstallPrompt, OfflineIndicator, PWAUpdatePrompt } from "./component
 function AppContent() {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
-  const isLogin = location.pathname === "/login";
 
   if (isDashboard) {
     return <AppRoutes />;
-  }
-
-  if (isLogin) {
-    return (
-      <div className="app-shell">
-        <main className="app-main">
-          <AppRoutes />
-        </main>
-      </div>
-    );
   }
 
   return (

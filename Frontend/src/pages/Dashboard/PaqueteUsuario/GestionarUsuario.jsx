@@ -7,12 +7,12 @@ import {
   Form,
   Input,
   Switch,
+  Select,
   message,
   Popconfirm,
   Tag,
   Card,
-  Typography,
-  Tooltip
+  Typography
 } from "antd";
 import {
   PlusOutlined,
@@ -21,13 +21,16 @@ import {
   UserOutlined,
   MailOutlined,
   LockOutlined,
-  TeamOutlined
+  Html5Outlined,
+  FilePdfOutlined,
+  FileExcelOutlined
 } from "@ant-design/icons";
 import UsuarioService from "../../../services/UsuarioService.js";
 import Filtador from "../Filtador";
 import Paginacion from "../Paginacion";
 
 const { Title } = Typography;
+const { Option } = Select;
 
 export default function GestionarUsuario() {
   const [usuarios, setUsuarios] = useState([]);
@@ -65,6 +68,7 @@ export default function GestionarUsuario() {
       user.nombre?.toLowerCase().includes(searchLower) ||
       user.apellido?.toLowerCase().includes(searchLower) ||
       user.correo?.toLowerCase().includes(searchLower) ||
+      user.rol?.toLowerCase().includes(searchLower) ||
       user.id?.toString().includes(searchLower)
     );
   });
@@ -82,11 +86,12 @@ export default function GestionarUsuario() {
         nombre: usuario.nombre,
         apellido: usuario.apellido,
         correo: usuario.correo,
+        rol: usuario.rol || "usuario_normal",
         estado: usuario.estado ?? true
       });
     } else {
       form.resetFields();
-      form.setFieldsValue({ estado: true });
+      form.setFieldsValue({ estado: true, rol: "usuario_normal" });
     }
     setModalVisible(true);
   };
@@ -100,7 +105,6 @@ export default function GestionarUsuario() {
   const handleSubmit = async (values) => {
     try {
       if (editingUsuario) {
-        // Si la contraseña está vacía, la eliminamos del payload para no sobrescribirla con vacío
         const payload = { ...values };
         if (!payload.password) {
           delete payload.password;
@@ -164,6 +168,27 @@ export default function GestionarUsuario() {
       width: 250
     },
     {
+      title: "Rol / Plan",
+      dataIndex: "rol",
+      key: "rol",
+      width: 150,
+      render: (rol) => {
+        let color = "blue";
+        let text = "Normal (Free)";
+        if (rol === "usuario_premium") {
+          color = "gold";
+          text = "Premium";
+        } else if (rol === "usuario_estrella") {
+          color = "purple";
+          text = "Estrella";
+        } else if (rol === "Administrador") {
+          color = "volcano";
+          text = "Administrador";
+        }
+        return <Tag color={color}>{text}</Tag>;
+      }
+    },
+    {
       title: "Estado",
       dataIndex: "estado",
       key: "estado",
@@ -181,7 +206,7 @@ export default function GestionarUsuario() {
     {
       title: "Acciones",
       key: "acciones",
-      width: 150,
+      width: 180,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
@@ -216,24 +241,29 @@ export default function GestionarUsuario() {
 
   return (
     <div className="admin-container">
-      <Card>
+      <Card variant="borderless">
         <div className="admin-header">
           <div className="admin-title-wrapper">
-            <TeamOutlined className="admin-header-icon" />
             <Title level={2}>Gestión de Usuarios</Title>
+            <span className="admin-subtitle">Administra los usuarios y sus licencias de Plan Risk 3D</span>
           </div>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => handleOpenModal()}
-            size="large"
-          >
-            Nuevo Usuario
-          </Button>
+          <div className="admin-header-actions">
+            <Button className="btn-export btn-export-html" icon={<Html5Outlined />}>HTML</Button>
+            <Button className="btn-export btn-export-pdf" icon={<FilePdfOutlined />}>PDF</Button>
+            <Button className="btn-export btn-export-excel" icon={<FileExcelOutlined />}>Excel</Button>
+            <Button
+              type="primary"
+              className="btn-primary-action"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenModal()}
+            >
+              Nuevo Usuario
+            </Button>
+          </div>
         </div>
 
         <Filtador
-          placeholder="Buscar por nombre, correo o ID..."
+          placeholder="Buscar por nombre, correo, rol o ID..."
           onSearch={setSearchText}
           value={searchText}
         />
@@ -269,7 +299,7 @@ export default function GestionarUsuario() {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ estado: true }}
+          initialValues={{ estado: true, rol: "usuario_normal" }}
         >
           <Form.Item
             name="nombre"
@@ -305,6 +335,19 @@ export default function GestionarUsuario() {
             help={editingUsuario ? "Dejar en blanco para mantener la actual" : null}
           >
             <Input.Password prefix={<LockOutlined />} placeholder="Contraseña" />
+          </Form.Item>
+
+          <Form.Item
+            name="rol"
+            label="Rol / Licencia"
+            rules={[{ required: true, message: "Por favor seleccione el rol" }]}
+          >
+            <Select placeholder="Seleccione un rol">
+              <Option value="usuario_normal">Free (Normal - 4 Plantillas)</Option>
+              <Option value="usuario_estrella">Estrella (180 Bs. - 24 Plantillas)</Option>
+              <Option value="usuario_premium">Premium (220 Bs. - Ilimitado)</Option>
+              <Option value="Administrador">Administrador</Option>
+            </Select>
           </Form.Item>
 
           <Form.Item name="estado" label="Estado" valuePropName="checked">

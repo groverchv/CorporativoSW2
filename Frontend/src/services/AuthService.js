@@ -1,38 +1,41 @@
 import { supabase } from "../api/supabase";
 
+const DJANGO_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "http://localhost:8000";
+
 const AuthService = {
   // Login
   login: async (correo, password) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: correo,
-        password: password,
+      const response = await fetch(`${DJANGO_URL}/api/users/auth/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: correo,
+          password: password,
+        }),
       });
-      if (error) throw error;
 
-      const session = data.session;
-      const user = data.user;
-
-      // Obtener perfil público de la tabla usuario
-      const { data: profile, error: profileError } = await supabase
-        .from("usuario")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error("Error al obtener perfil público:", profileError);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Credenciales inválidas");
       }
 
+      const data = await response.json();
+
       const userData = {
-        token: session.access_token,
-        refreshToken: session.refresh_token,
-        id: user.id,
-        correo: user.email,
-        nombre: profile?.nombre || "",
-        apellido: profile?.apellido || "",
-        celular: profile?.celular || "",
-        organizacion: profile?.organizacion || "",
+        token: data.access,
+        refreshToken: data.refresh,
+        id: data.usuario.id,
+        correo: data.usuario.email,
+        nombre: data.usuario.nombre || "",
+        apellido: data.usuario.apellido || "",
+        rol: data.usuario.rol || "usuario_normal",
+        profesion: data.usuario.profesion || "estudiante",
+        fecha_nacimiento: data.usuario.fecha_nacimiento || "",
+        telefono: data.usuario.telefono || "",
+        url: data.usuario.url || "",
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
@@ -44,48 +47,41 @@ const AuthService = {
 
   // Logout
   logout: () => {
-    supabase.auth.signOut().catch((err) => console.error("Error al desloguear de Supabase:", err));
     localStorage.removeItem("user");
   },
 
   // Register
   register: async (userData) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: userData.correo,
-        password: userData.password,
-        options: {
-          data: {
-            nombre: userData.nombre,
-            apellido: userData.apellido,
-            celular: userData.celular || "",
-            organizacion: userData.organizacion || "",
-          },
+      const response = await fetch(`${DJANGO_URL}/api/users/auth/registro/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      });
-      if (error) throw error;
-
-      // Si Supabase devuelve una sesión activa (Email Confirmation desactivado en Consola)
-      if (data?.session) {
-        const session = data.session;
-        const user = data.user;
-        const userDataLocal = {
-          token: session.access_token,
-          refreshToken: session.refresh_token,
-          id: user.id,
-          correo: user.email,
+        body: JSON.stringify({
           nombre: userData.nombre,
-          apellido: userData.apellido,
-          celular: userData.celular || "",
-          organizacion: userData.organizacion || "",
-        };
-        localStorage.setItem("user", JSON.stringify(userDataLocal));
+          apellido: userData.apellido || "",
+          email: userData.correo,
+          password: userData.password,
+          rol: userData.rol || "usuario_normal",
+          profesion: userData.profesion || "estudiante",
+          fecha_nacimiento: userData.fecha_nacimiento || null,
+          telefono: userData.celular ? parseInt(userData.celular.toString().replace(/\D/g, "")) : null,
+          acepta_politicas: userData.acepta_politicas || false,
+          fecha_aceptacion: userData.fecha_aceptacion || null,
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        const errMessage = Object.values(errData).flat().join(", ") || "Error al registrar usuario";
+        throw new Error(errMessage);
       }
 
+      const data = await response.json();
       return { 
         message: "Usuario registrado exitosamente",
-        session: data?.session,
-        user: data?.user
+        user: data
       };
     } catch (error) {
       throw error.message || "Error al registrar usuario";
@@ -97,15 +93,11 @@ const AuthService = {
     return JSON.parse(localStorage.getItem("user"));
   },
 
-  // Refresh token (mocked since Supabase auto-refreshes)
+  // Refresh token
   refreshToken: async () => {
-    const sessionRes = await supabase.auth.getSession();
-    const session = sessionRes.data?.session;
-    if (session) {
-      const user = AuthService.getCurrentUser();
-      const updatedUser = { ...user, token: session.access_token, refreshToken: session.refresh_token };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      return session.access_token;
+    const user = AuthService.getCurrentUser();
+    if (user && user.refreshToken) {
+      return user.token;
     }
     throw new Error("No session active");
   },
@@ -121,6 +113,83 @@ const AuthService = {
     const user = AuthService.getCurrentUser();
     return user?.token;
   },
+
+  // Refrescar datos del usuario desde el backend (después de pago)
+  refreshUserData: async () => {
+    const user = AuthService.getCurrentUser();
+    if (!user?.token || !user?.id) return null;
+
+    try {
+      const response = await fetch(`${DJANGO_URL}/api/users/usuarios/${user.id}/`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) return null;
+
+      const data = await response.json();
+      const updatedUser = {
+        ...user,
+        rol: data.rol || user.rol,
+        nombre: data.nombre || user.nombre,
+        apellido: data.apellido || user.apellido,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      return updatedUser;
+    } catch (error) {
+      console.error("Error refreshing user data:", error);
+      return null;
+    }
+  },
+
+  // Crear sesión de Stripe Checkout
+  createCheckoutSession: async (plan) => {
+    const user = AuthService.getCurrentUser();
+    if (!user?.token) throw new Error("No autenticado");
+
+    const response = await fetch(`${DJANGO_URL}/api/users/stripe/create-checkout-session/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ plan }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || "Error al crear sesión de pago");
+    }
+
+    return await response.json();
+  },
+
+  // Confirmar pago de Stripe (alternativa al webhook)
+  confirmPayment: async (sessionId) => {
+    const user = AuthService.getCurrentUser();
+    if (!user?.token) throw new Error("No autenticado");
+
+    const response = await fetch(`${DJANGO_URL}/api/users/stripe/confirm-payment/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || "Error al confirmar pago");
+    }
+
+    return await response.json();
+  },
 };
 
 export default AuthService;
+

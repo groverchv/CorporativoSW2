@@ -1,109 +1,154 @@
 import React from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Button } from "antd";
 import {
     DashboardOutlined,
     UserOutlined,
-    FileTextOutlined,
-    SettingOutlined,
-    MenuOutlined,
-    SafetyOutlined,
-    TeamOutlined,
     AppstoreOutlined,
+    HomeOutlined,
+    LeftOutlined,
+    RightOutlined,
+    LogoutOutlined,
+    DollarOutlined,
+    ProfileOutlined
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import AuthService from "../../services/AuthService.js";
 
 const { Sider } = Layout;
 
-export default function DashboardSidebar({ collapsed }) {
+export default function DashboardSidebar({ collapsed, onToggle }) {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const menuItems = [
-        {
-            key: "/dashboard",
-            icon: <DashboardOutlined />,
-            label: "Inicio",
-        },
-        {
-            key: "paquete-usuario",
-            icon: <TeamOutlined />,
-            label: "Paquete Usuario",
-            children: [
-                {
-                    key: "/dashboard/usuarios",
-                    icon: <UserOutlined />,
-                    label: "Gestionar Usuario",
-                },
-                {
-                    key: "/dashboard/roles",
-                    icon: <SafetyOutlined />,
-                    label: "Gestionar Rol",
-                },
-                {
-                    key: "/dashboard/rol-usuario",
-                    icon: <TeamOutlined />,
-                    label: "Asignar Rol",
-                },
-            ]
-        },
-        {
-            key: "paquete-contenido",
-            icon: <FileTextOutlined />,
-            label: "Paquete Contenido",
-            children: [
-                {
-                    key: "/dashboard/menus",
-                    icon: <MenuOutlined />,
-                    label: "Gestionar Menu",
-                },
-                {
-                    key: "/dashboard/sub_menus",
-                    icon: <AppstoreOutlined />,
-                    label: "Gestionar Submenu",
-                },
-                {
-                    key: "/dashboard/contenido",
-                    icon: <FileTextOutlined />,
-                    label: "Gestionar Contenido",
-                },
-            ]
-        },
-        {
-            key: "/dashboard/presentacion",
-            icon: <SettingOutlined />,
-            label: "Gestionar Presentacion",
-        },
-    ];
+    // Obtener usuario actual
+    const currentUser = AuthService.getCurrentUser();
+    const userRole = currentUser?.rol || "usuario_normal";
+    const isAdmin = userRole.toLowerCase() === "administrador" || userRole.toLowerCase() === "admin";
+
+    const handleLogout = () => {
+        AuthService.logout();
+        navigate("/login");
+    };
+
+    const menuItems = isAdmin
+        ? [
+            {
+                key: "/dashboard/admin-home",
+                icon: <DashboardOutlined />,
+                label: "Dashboard",
+            },
+            {
+                key: "/dashboard/perfil",
+                icon: <UserOutlined />,
+                label: "Mi Perfil",
+            },
+            {
+                key: "gestion",
+                icon: <AppstoreOutlined />,
+                label: "Gestión",
+                children: [
+                    {
+                        key: "/dashboard/usuarios",
+                        icon: <UserOutlined />,
+                        label: "Usuarios",
+                    },
+                    {
+                        key: "/dashboard/planes",
+                        icon: <DollarOutlined />,
+                        label: "Precios de Planes"
+                    },
+                    {
+                        key: "/dashboard/historial-planos",
+                        icon: <ProfileOutlined />,
+                        label: "Historial de Planos"
+                    }
+                ]
+            },
+        ]
+        : [
+            {
+                key: "/dashboard/cliente",
+                icon: <DashboardOutlined />,
+                label: "Dashboard",
+            },
+            {
+                key: "/dashboard/perfil",
+                icon: <UserOutlined />,
+                label: "Mi Perfil",
+            },
+            {
+                key: "/inicio",
+                icon: <HomeOutlined />,
+                label: "Volver a la Web",
+            }
+        ];
 
     const handleMenuClick = ({ key }) => {
-        navigate(key);
+        if (key.startsWith("/")) {
+            navigate(key);
+        }
     };
 
     return (
         <Sider
-            width={250}
+            width={260}
+            collapsedWidth={75}
             collapsible
             collapsed={collapsed}
             trigger={null}
-            breakpoint="lg"
-            collapsedWidth={0}
-            style={{
-                background: "#fff",
-                boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
-                overflow: 'auto',
-                height: 'calc(100vh - 64px)',
-                position: 'sticky',
-                top: 64,
-                left: 0,
-            }}
+            theme="light"
+            className="premium-sidebar"
         >
-            <Menu
-                mode="inline"
-                selectedKeys={[location.pathname]}
-                items={menuItems}
-                onClick={handleMenuClick}
-                style={{ height: "100%", borderRight: 0 }}
+            {/* Botón de Colapso Flotante Circular */}
+            <Button
+                type="text"
+                className="sidebar-collapse-trigger"
+                icon={collapsed ? <RightOutlined /> : <LeftOutlined />}
+                onClick={onToggle}
             />
+
+            {/* Logo de la Aplicación */}
+            <div className="sidebar-logo-container">
+                <div className="sidebar-logo-icon">P</div>
+                {!collapsed && <span className="sidebar-logo-text">PlanRisk3D</span>}
+            </div>
+
+            {/* Menú de Navegación */}
+            <div className="sidebar-menu-wrapper">
+                <Menu
+                    mode="inline"
+                    selectedKeys={[location.pathname]}
+                    items={menuItems}
+                    onClick={handleMenuClick}
+                    className="sidebar-menu"
+                />
+            </div>
+
+            {/* Contenedor de Pie de Sidebar */}
+            <div className="sidebar-bottom-container">
+                {/* Botón Cerrar Sesión */}
+                <Button
+                    type="text"
+                    danger
+                    icon={<LogoutOutlined />}
+                    className="sidebar-logout-btn"
+                    onClick={handleLogout}
+                    block
+                >
+                    {!collapsed && <span>Cerrar sesión</span>}
+                </Button>
+
+                {/* Footer del Usuario Conectado */}
+                {!collapsed && currentUser && (
+                    <div className="sidebar-user-footer">
+                        <span className="user-footer-title">Conectado como</span>
+                        <span className="user-footer-email" title={currentUser.correo}>
+                            {currentUser.correo}
+                        </span>
+                        <span className="user-footer-app">Plan Risk 3D</span>
+                    </div>
+                )}
+            </div>
         </Sider>
     );
 }

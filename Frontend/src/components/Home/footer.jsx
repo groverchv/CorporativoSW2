@@ -101,10 +101,9 @@ export default function Footer() {
                 lineHeight: 2,
               }}
             >
-              <li>Sobre Nosotros</li>
-              <li>Planes &amp; Precios</li>
-              <li>Casos de Éxito</li>
-              <li>Términos de Servicio</li>
+              <li><a href="/planes" style={{ color: "rgba(255,255,255,0.75)", transition: "color 0.2s" }} onMouseEnter={(e) => e.target.style.color = "#d97706"} onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.75)"}>Planes &amp; Precios</a></li>
+              <li><a href="/terminos" style={{ color: "rgba(255,255,255,0.75)", transition: "color 0.2s" }} onMouseEnter={(e) => e.target.style.color = "#d97706"} onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.75)"}>Términos de Servicio</a></li>
+              <li><a href="/privacidad" style={{ color: "rgba(255,255,255,0.75)", transition: "color 0.2s" }} onMouseEnter={(e) => e.target.style.color = "#d97706"} onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.75)"}>Política de Privacidad</a></li>
             </ul>
           </Col>
         </Row>

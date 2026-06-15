@@ -1,6 +1,6 @@
 // src/pages/Auth/Login.jsx
 import React, { useState } from "react";
-import { Form, Input, Button, Card, message, Typography, Alert, Radio } from "antd";
+import { Form, Input, Button, Card, message, Typography, Alert, Radio, Select, Checkbox } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -29,24 +29,23 @@ export default function Login() {
 
     try {
       if (isRegister) {
-        // Registrar usuario (e iniciar sesión automáticamente si está configurado en Supabase)
-        const result = await AuthService.register({
+        // Registrar usuario en Django
+        await AuthService.register({
           correo: values.correo,
           password: values.password,
           nombre: values.nombre,
           apellido: values.apellido,
           celular: values.celular,
           organizacion: values.organizacion,
+          rol: values.rol,
+          profesion: values.profesion,
+          fecha_nacimiento: values.fecha_nacimiento,
+          acepta_politicas: values.acepta_politicas,
+          fecha_aceptacion: values.acepta_politicas ? new Date().toISOString() : null,
         });
 
-        if (!result.session) {
-          message.info({
-            content: 'Registro exitoso. Por favor confirma tu correo electrónico para poder ingresar.',
-            duration: 5,
-          });
-          setLoading(false);
-          return;
-        }
+        // Iniciar sesión automáticamente inmediatamente después de registrarse
+        await AuthService.login(values.correo, values.password);
       } else {
         // Iniciar sesión
         await AuthService.login(values.correo, values.password);
@@ -60,7 +59,7 @@ export default function Login() {
       });
 
       setTimeout(() => {
-        navigate("/perfil");
+        navigate("/dashboard");
       }, 1500);
 
     } catch (error) {
@@ -171,6 +170,60 @@ export default function Login() {
                   placeholder="Ej. Constructora Delta"
                   disabled={loading}
                 />
+              </Form.Item>
+
+              <Form.Item
+                name="rol"
+                label={<span className="form-label-dark">Plan / Licencia</span>}
+                rules={[{ required: true, message: "Selecciona tu plan inicial" }]}
+                initialValue="usuario_normal"
+              >
+                <Select disabled={loading}>
+                  <Select.Option value="usuario_normal">Free (Básico - 4 Plantillas)</Select.Option>
+                  <Select.Option value="usuario_estrella">Estrella (180 Bs. - 24 Plantillas)</Select.Option>
+                  <Select.Option value="usuario_premium">Premium (220 Bs. - Ilimitado)</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="profesion"
+                label={<span className="form-label-dark">Profesión</span>}
+                rules={[{ required: true, message: "Selecciona tu profesión" }]}
+                initialValue="estudiante"
+              >
+                <Select disabled={loading}>
+                  <Select.Option value="estudiante">Estudiante</Select.Option>
+                  <Select.Option value="profesional">Profesional</Select.Option>
+                  <Select.Option value="otro">Otro</Select.Option>
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="fecha_nacimiento"
+                label={<span className="form-label-dark">Fecha de Nacimiento</span>}
+                rules={[{ required: true, message: "Ingresa tu fecha de nacimiento" }]}
+              >
+                <Input
+                  type="date"
+                  disabled={loading}
+                  style={{ colorScheme: "dark" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="acepta_politicas"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) =>
+                      value ? Promise.resolve() : Promise.reject(new Error("Debes aceptar los términos y políticas")),
+                  },
+                ]}
+                style={{ marginBottom: 12 }}
+              >
+                <Checkbox disabled={loading} style={{ color: "#cbd5e1" }}>
+                  Acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ color: "#d97706" }}>Términos y Condiciones</a> y la <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: "#d97706" }}>Política de Privacidad</a> de Plan Risk 3D.
+                </Checkbox>
               </Form.Item>
             </>
           )}

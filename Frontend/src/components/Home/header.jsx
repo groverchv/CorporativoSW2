@@ -158,14 +158,24 @@ export default function Header() {
         {/* Lado Derecho: Acciones */}
         <Space className="app-header__right">
           {isAuthenticated ? (
-            <Button
-              type="text"
-              className="app-header__link"
-              icon={<UserOutlined />}
-              onClick={() => navigate("/perfil")}
-            >
-              {!isMobile && "MI PERFIL"}
-            </Button>
+            <Space>
+              <Button
+                type="text"
+                className="app-header__link"
+                icon={<DashboardOutlined />}
+                onClick={() => navigate("/dashboard")}
+              >
+                {!isMobile && "DASHBOARD"}
+              </Button>
+              <Button
+                type="text"
+                className="app-header__link"
+                icon={<UserOutlined />}
+                onClick={() => navigate("/dashboard/perfil")}
+              >
+                {!isMobile && "MI PERFIL"}
+              </Button>
+            </Space>
           ) : (
             <Button
               type="text"
