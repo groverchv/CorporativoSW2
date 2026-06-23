@@ -1,6 +1,6 @@
 import { supabase } from "../api/supabase";
 
-const DJANGO_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "http://localhost:8000";
+const DJANGO_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "https://defensasw2.jorgechoquecalle.engineer";
 
 const AuthService = {
   // Login
