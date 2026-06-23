@@ -8,6 +8,7 @@ import AppRoutes from "./routes/appRoutes";
 import "./App.css";
 import DynamicSlider from "./components/Home/DynamicSlider";
 import { PWAInstallPrompt, OfflineIndicator, PWAUpdatePrompt } from "./components/PWA";
+import Chatbot from "./components/Chatbot/Chatbot";
 
 function AppContent() {
   const location = useLocation();
@@ -48,6 +49,7 @@ export default function App() {
         <PWAInstallPrompt />
         <PWAUpdatePrompt />
         <AppContent />
+        <Chatbot />
       </BrowserRouter>
     </ConfigProvider>
   );

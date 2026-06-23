@@ -6,7 +6,8 @@ import {
   AppstoreOutlined,
   ShoppingOutlined,
   PhoneOutlined,
-  UserOutlined
+  UserOutlined,
+  TeamOutlined
 } from "@ant-design/icons";
 import AuthService from "../../services/AuthService";
 
@@ -22,6 +23,7 @@ export default function Navbar() {
   const items = [
     { key: "inicio", label: "Inicio", href: "/inicio", icon: <HomeOutlined /> },
     { key: "tecnologia", label: "Tecnología", href: "/tecnologia", icon: <AppstoreOutlined /> },
+    { key: "nosotros", label: "Sobre Nosotros", href: "/nosotros", icon: <TeamOutlined /> },
     { key: "planes", label: "Servicios & Planes", href: "/planes", icon: <ShoppingOutlined /> },
     { key: "contacto", label: "Contacto", href: "/contacto", icon: <PhoneOutlined /> },
   ];

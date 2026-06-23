@@ -10,6 +10,7 @@ import Planes from "../pages/Static/Planes";
 import Contacto from "../pages/Static/Contacto";
 import Terminos from "../pages/Static/Terminos";
 import Privacidad from "../pages/Static/Privacidad";
+import Nosotros from "../pages/Static/Nosotros";
 
 // Guards
 import PrivateRoute from "../components/PrivateRoute";
@@ -50,6 +51,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Navigate to="/inicio" replace />} />
       <Route path="/inicio" element={<Inicio />} />
       <Route path="/tecnologia" element={<Tecnologia />} />
+      <Route path="/nosotros" element={<Nosotros />} />
       <Route path="/planes" element={<Planes />} />
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/login" element={<Login />} />
