@@ -109,7 +109,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,woff2,woff,ttf}'],
         
         // Aumentar límite para archivos grandes (50MB) y excluir SVGs muy grandes
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024, // 15MB
         
         // Excluir archivos muy grandes del precache
         globIgnores: ['**/fondo*.svg', '**/Ciencias*.svg'],
