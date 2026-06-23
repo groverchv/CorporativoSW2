@@ -124,7 +124,7 @@ export default function ClienteDashboard() {
                     size="large" 
                     className="btn-outline"
                     icon={<AndroidOutlined />}
-                    onClick={() => message.info("La aplicación móvil estará disponible muy pronto en Google Play Store.")}
+                    onClick={() => window.open("https://drive.google.com/drive/folders/1ZyFxJGkXZBFsdD0BZSkxDZtCftgisoA9?usp=sharing", "_blank")}
                   >
                     Descargar desde Play Store
                   </Button>
