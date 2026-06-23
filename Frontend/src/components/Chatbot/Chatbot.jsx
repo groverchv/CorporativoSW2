@@ -3,7 +3,7 @@ import { MessageOutlined, CloseOutlined, SendOutlined, RobotOutlined, UserOutlin
 import { Button, Input, Spin } from 'antd';
 import './Chatbot.css';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const API_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "https://defensasw2.jorgechoquecalle.engineer";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);

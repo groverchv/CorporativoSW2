@@ -3,7 +3,7 @@ import { Card, Table, Typography, Tag, Spin, Button, message } from 'antd';
 import { SyncOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
-const DJANGO_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "http://localhost:8000";
+const DJANGO_URL = import.meta.env.VITE_DJANGO_BACKEND_URL || "https://defensasw2.jorgechoquecalle.engineer";
 
 const getAuthHeaders = () => {
   const userStr = localStorage.getItem("user");
